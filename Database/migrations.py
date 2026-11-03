@@ -10,6 +10,7 @@ def run_migrations() -> None:
     db = get_db()
     # Seed AI providers on first run
     defaults = [
+        {"name": "nvidia", "label": "NVIDIA FLUX", "enabled": True},
         {"name": "huggingface", "label": "Hugging Face", "enabled": True},
         {"name": "pollinations", "label": "Pollinations", "enabled": True},
         {"name": "gemini", "label": "Gemini", "enabled": True},
