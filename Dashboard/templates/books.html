@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>📚 All Books</h2>
+<table class="table">
+  <thead><tr><th>Title</th><th>Topic</th><th>Status</th><th>Created</th><th>Downloads</th></tr></thead>
+  <tbody>
+  {% for b in books %}
+    <tr>
+      <td>{{ b.title }}</td>
+      <td>{{ b.topic }}</td>
+      <td>{{ b.status }}</td>
+      <td>{{ b.created_at.strftime('%Y-%m-%d') }}</td>
+      <td>
+        {% for kind in ['zip','interior','front_cover','back_cover','full_wrap','preview'] %}
+          {% if b.files[kind] %}
+            <a class="btn btn-sm btn-outline-primary" href="{{ url_for('download_file', book_id=b.book_id, kind=kind) }}">{{ kind }}</a>
+          {% endif %}
+        {% endfor %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

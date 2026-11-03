@@ -1,0 +1,7 @@
+body { background: #f8f9fa; }
+.card { border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.navbar-brand { font-weight: 700; }
+.table td { vertical-align: middle; }
+@media (max-width: 576px) {
+  .btn { font-size: 0.85rem; padding: 0.35rem 0.6rem; }
+}

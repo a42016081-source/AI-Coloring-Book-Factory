@@ -1,0 +1,13 @@
+{
+  "book_sizes": {
+    "8.5x11": {"width_in": 8.5, "height_in": 11.0, "label": "8.5 × 11 in"},
+    "8x10": {"width_in": 8.0, "height_in": 10.0, "label": "8 × 10 in"},
+    "A4": {"width_in": 8.27, "height_in": 11.69, "label": "A4"}
+  },
+  "art_styles": ["Cute Cartoon", "Realistic", "Minimalist", "Kawaii", "Detailed"],
+  "target_ages": ["2-4", "4-8", "6-10", "8-12", "Adult"],
+  "languages": ["English", "Hindi"],
+  "difficulties": ["Easy", "Medium", "Hard"],
+  "book_types": ["Coloring Book", "Activity Book", "Mandalas"],
+  "paper_types": {"white": 0.002252, "cream": 0.0025}
+}

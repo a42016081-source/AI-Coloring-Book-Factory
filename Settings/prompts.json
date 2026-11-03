@@ -1,0 +1,14 @@
+{
+  "base_prompt": "black and white coloring book page, clean vector line art, white background, no shading, no color, no text, no watermark, {topic}, {style}, age {age}, {difficulty} details, high quality printable outline art",
+  "topic_templates": {
+    "Animals": ["a cute elephant", "a playful kitten", "a friendly lion", "a baby deer"],
+    "Dinosaurs": ["a friendly T-rex", "a baby triceratops", "a brachiosaurus", "a pterodactyl"],
+    "Cute Cats": ["a sleepy cat", "a playful kitten with yarn", "a cat in a teacup"],
+    "Cute Dogs": ["a happy puppy", "a dog with a bone", "a poodle"],
+    "Mandala": ["an intricate mandala flower", "a symmetrical mandala circle"],
+    "Vehicles": ["a fire truck", "a race car", "an airplane", "a tractor"],
+    "Nature": ["a tree with birds", "a flower garden", "mountains and sun"]
+  },
+  "cover_prompt": "professional book cover art, vibrant colors, eye-catching illustration of {topic}, {style}, marketable, commercial quality, no text",
+  "back_prompt": "back cover art, subtle decorative pattern, {topic} theme, colorful, professional"
+}

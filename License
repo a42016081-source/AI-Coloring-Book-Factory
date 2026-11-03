@@ -1,0 +1,89 @@
+
+### `build_project.py` (Run this after pasting all files to auto-create the full structure)
+
+```python
+#!/usr/bin/env python3
+"""
+Run this script to:
+1. Create the full folder tree
+2. Verify all files exist
+3. Package into AI-Coloring-Book-Factory.zip
+
+Place ALL files given in the assistant's response into a folder next to this
+script (create a tree matching the paths shown), then run:
+    python build_project.py
+"""
+import os
+import shutil
+import zipfile
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent
+OUT = ROOT / "AI-Coloring-Book-Factory"
+ZIP = ROOT / "AI-Coloring-Book-Factory.zip"
+
+REQUIRED_FILES = [
+    "requirements.txt", ".env.example", ".gitignore", "config.py",
+    "app.py", "bot.py", "README.md", "build_project.py",
+    "Database/__init__.py", "Database/mongodb.py", "Database/models.py",
+    "Database/repositories.py", "Database/indexes.py", "Database/migrations.py",
+    "Settings/config.json", "Settings/prompts.json",
+    "AI/__init__.py", "AI/image_generator.py", "AI/provider_manager.py",
+    "AI/prompt_generator.py", "AI/quality_checker.py",
+    "PDF/__init__.py", "PDF/pdf_creator.py", "PDF/cover_creator.py",
+    "PDF/preview_creator.py",
+    "Metadata/__init__.py", "Metadata/metadata_generator.py",
+    "Telegram/__init__.py", "Telegram/keyboards.py", "Telegram/states.py",
+    "Telegram/handlers.py",
+    "Dashboard/__init__.py", "Dashboard/auth.py", "Dashboard/routes.py",
+    "Dashboard/templates/base.html", "Dashboard/templates/login.html",
+    "Dashboard/templates/dashboard.html", "Dashboard/templates/create.html",
+    "Dashboard/templates/books.html", "Dashboard/templates/error.html",
+    "Dashboard/static/style.css", "Dashboard/static/app.js",
+    "Storage/__init__.py", "Storage/storage_manager.py",
+    "Storage/gridfs_storage.py", "Storage/cloud_storage.py",
+    "Utils/__init__.py", "Utils/zip_creator.py", "Utils/file_manager.py",
+    "Utils/validators.py",
+    "Tests/__init__.py", "Tests/conftest.py", "Tests/test_database.py",
+    "Tests/test_settings.py", "Tests/test_telegram.py", "Tests/test_pdf.py",
+    "Tests/test_zip.py",
+    ".github/workflows/create-book.yml",
+    ".github/scripts/run_generation.py",
+]
+
+
+def main():
+    print("🔍 Verifying file structure...")
+    missing = []
+    for f in REQUIRED_FILES:
+        p = ROOT / f
+        if not p.exists():
+            missing.append(f)
+    if missing:
+        print("\n⚠️ MISSING FILES — create these before packaging:")
+        for m in missing:
+            print(f"   - {m}")
+        print(f"\nMissing: {len(missing)}/{len(REQUIRED_FILES)}")
+        proceed = input("\nContinue anyway? [y/N] ").strip().lower() == "y"
+        if not proceed:
+            return
+
+    print(f"\n📦 Packaging → {ZIP.name}")
+    if ZIP.exists():
+        ZIP.unlink()
+
+    with zipfile.ZipFile(ZIP, "w", zipfile.ZIP_DEFLATED) as zf:
+        for f in REQUIRED_FILES:
+            p = ROOT / f
+            if p.exists():
+                zf.write(p, arcname=f"AI-Coloring-Book-Factory/{f}")
+
+    # Also add empty output dir
+    zf.close()
+
+    print(f"✅ Done: {ZIP}")
+    print(f"   Size: {ZIP.stat().st_size / 1024:.1f} KB")
+
+
+if __name__ == "__main__":
+    main()

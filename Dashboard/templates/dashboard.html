@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>📊 Dashboard</h2>
+<div class="row mb-3">
+  <div class="col-md-4">
+    <div class="card p-3 {{ 'border-success' if db_ok else 'border-danger' }}">
+      <h6>MongoDB</h6>
+      <p class="mb-0">{{ '✅ Connected' if db_ok else '❌ Disconnected' }}</p>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card p-3">
+      <h6>Pages</h6>
+      <p class="mb-0">{{ settings.default_pages }}</p>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card p-3">
+      <h6>Provider</h6>
+      <p class="mb-0">{{ settings.ai_provider }}</p>
+    </div>
+  </div>
+</div>
+
+<div class="card p-3 mb-3">
+  <h5>⚙️ Settings</h5>
+  <form method="post" action="{{ url_for('update_settings') }}" class="row g-2">
+    <input type="hidden" name="_csrf" value="{{ csrf }}">
+    <div class="col-md-3">
+      <label>Pages</label>
+      <input class="form-control" type="number" name="default_pages" value="{{ settings.default_pages }}" min="1" max="200">
+    </div>
+    <div class="col-md-3">
+      <label>Size</label>
+      <select class="form-select" name="book_size">
+        {% for s in ['8.5x11','8x10','A4'] %}
+        <option value="{{s}}" {{ 'selected' if settings.book_size==s }}>{{s}}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-3">
+      <label>Age</label>
+      <input class="form-control" name="target_age" value="{{ settings.target_age }}">
+    </div>
+    <div class="col-md-3">
+      <label>Language</label>
+      <select class="form-select" name="language">
+        {% for l in ['English','Hindi'] %}
+        <option {{ 'selected' if settings.language==l }}>{{l}}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-3">
+      <label>Art Style</label>
+      <input class="form-control" name="art_style" value="{{ settings.art_style }}">
+    </div>
+    <div class="col-md-3 form-check ms-2 mt-4">
+      <input class="form-check-input" type="checkbox" name="black_white" {{ 'checked' if settings.black_white }}>
+      <label class="form-check-label">Black & White</label>
+    </div>
+    <div class="col-md-3 form-check mt-4">
+      <input class="form-check-input" type="checkbox" name="border" {{ 'checked' if settings.border }}>
+      <label class="form-check-label">Border</label>
+    </div>
+    <div class="col-12"><button class="btn btn-primary">Save Settings</button></div>
+  </form>
+</div>
+
+<div class="card p-3">
+  <h5>📖 Recent Books</h5>
+  {% if books %}
+  <table class="table">
+    <thead><tr><th>Title</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead>
+    <tbody>
+      {% for b in books %}
+      <tr>
+        <td>{{ b.title }}</td>
+        <td><span class="badge bg-{{ 'success' if b.status=='COMPLETED' else 'warning' }}">{{ b.status }}</span></td>
+        <td>{{ b.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+        <td>
+          {% if b.files.zip %}<a class="btn btn-sm btn-primary" href="{{ url_for('download_file', book_id=b.book_id, kind='zip') }}">ZIP</a>{% endif %}
+          {% if b.files.interior %}<a class="btn btn-sm btn-outline-primary" href="{{ url_for('download_file', book_id=b.book_id, kind='interior') }}">PDF</a>{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}<p>No books yet.</p>{% endif %}
+</div>
+{% endblock %}

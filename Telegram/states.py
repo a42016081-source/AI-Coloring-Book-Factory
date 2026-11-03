@@ -1,0 +1,17 @@
+"""Conversation state constants."""
+(
+    MAIN_MENU,
+    SETTINGS,
+    ADVANCED,
+    BOOK_TOPIC,
+    BOOK_CUSTOM_TOPIC,
+    WAIT_PAGES,
+    WAIT_BOOK_SIZE,
+    WAIT_AGE,
+    WAIT_STYLE,
+    WAIT_LANG,
+    WAIT_CUSTOM_PROMPT,
+    AI_PROVIDER_MENU,
+    BOOK_MANAGEMENT,
+    DOWNLOAD_MENU,
+) = range(14)
