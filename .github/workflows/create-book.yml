@@ -1,0 +1,108 @@
+name: Generate Coloring Book
+
+on:
+  workflow_dispatch:
+    inputs:
+      topic:
+        description: "Book Topic"
+        required: true
+        default: "Animals"
+      page_count:
+        description: "Number of Pages"
+        required: true
+        default: "10"
+      book_size:
+        description: "Book Size (8.5x11, 8x10, A4)"
+        required: true
+        default: "8.5x11"
+      art_style:
+        description: "Art Style"
+        required: true
+        default: "Cute Cartoon"
+      target_age:
+        description: "Target Age"
+        required: true
+        default: "4-8"
+      telegram_user_id:
+        description: "Telegram User ID"
+        required: true
+        default: "0"
+      book_id:
+        description: "Book ID (empty = create new)"
+        required: false
+        default: ""
+
+  schedule:
+    - cron: "0 */6 * * *"
+
+concurrency:
+  group: book-${{ github.event.inputs.telegram_user_id || 'scheduled-queue' }}
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # Manual book generation
+      - name: Generate Manual Book
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          MONGODB_DATABASE: ${{ secrets.MONGODB_DATABASE }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          SECRET_ENCRYPTION_KEY: ${{ secrets.SECRET_ENCRYPTION_KEY }}
+          STORAGE_PROVIDER: ${{ secrets.STORAGE_PROVIDER }}
+          S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
+          S3_BUCKET: ${{ secrets.S3_BUCKET }}
+          S3_ACCESS_KEY: ${{ secrets.S3_ACCESS_KEY }}
+          S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
+          TOPIC: ${{ github.event.inputs.topic }}
+          PAGES: ${{ github.event.inputs.page_count }}
+          SIZE: ${{ github.event.inputs.book_size }}
+          STYLE: ${{ github.event.inputs.art_style }}
+          AGE: ${{ github.event.inputs.target_age }}
+          UID: ${{ github.event.inputs.telegram_user_id || '0' }}
+          BOOK_ID: ${{ github.event.inputs.book_id }}
+        run: python .github/scripts/run_generation.py
+
+      # Automatic pending-job processing every 6 hours
+      - name: Process Pending Book Requests
+        if: github.event_name == 'schedule'
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          MONGODB_DATABASE: ${{ secrets.MONGODB_DATABASE }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          SECRET_ENCRYPTION_KEY: ${{ secrets.SECRET_ENCRYPTION_KEY }}
+          STORAGE_PROVIDER: ${{ secrets.STORAGE_PROVIDER }}
+          S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
+          S3_BUCKET: ${{ secrets.S3_BUCKET }}
+          S3_ACCESS_KEY: ${{ secrets.S3_ACCESS_KEY }}
+          S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
+        run: python .github/scripts/run_pending_jobs.py
+
+      - name: Upload Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: book-output-${{ github.run_number }}
+          path: output/
+          retention-days: 7
+          if-no-files-found: warn
