@@ -1,4 +1,3 @@
-```python
 """All Telegram handlers."""
 
 import logging
@@ -329,6 +328,7 @@ async def on_text(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     # AI Provider menu
 
     provider_map = {
+        "NVIDIA FLUX": "nvidia",
         "Hugging Face": "huggingface",
         "Pollinations": "pollinations",
         "Gemini": "gemini",
@@ -852,4 +852,3 @@ async def cmd_history(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         return
 
     await _show_my_books(update)
-```
