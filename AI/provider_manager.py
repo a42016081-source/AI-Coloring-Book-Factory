@@ -7,8 +7,8 @@ from Database.repositories import SettingsRepository, AIProviderRepository
 
 logger = logging.getLogger(__name__)
 
-PROVIDERS = ["huggingface", "pollinations", "gemini", "custom"]
-FALLBACK_ORDER = ["pollinations", "huggingface", "gemini", "custom"]
+PROVIDERS = ["nvidia", "huggingface", "pollinations", "gemini", "custom"]
+FALLBACK_ORDER = ["nvidia", "pollinations", "huggingface", "gemini", "custom"]
 
 
 class ProviderManager:
@@ -21,7 +21,9 @@ class ProviderManager:
     def health_check(self, provider: str) -> bool:
         try:
             ok = False
-            if provider == "pollinations":
+            if provider == "nvidia":
+                ok = bool(Config.NVIDIA_API_KEY)
+            elif provider == "pollinations":
                 ok = True  # public endpoint, no auth
             elif provider == "huggingface":
                 ok = bool(Config.HF_TOKEN)
