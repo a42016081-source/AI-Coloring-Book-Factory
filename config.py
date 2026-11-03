@@ -30,7 +30,22 @@ class Config:
 
     # AI
     HF_TOKEN = os.getenv("HF_TOKEN", "")
+    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+    # NVIDIA NIM APIs: FLUX image generation + Llama prompt enhancement
     NVIDIA_API_KEY = os.getenv("NVIDIA_API_KEY", "")
+    NVIDIA_FLUX_URL = os.getenv(
+        "NVIDIA_FLUX_URL",
+        "https://ai.api.nvidia.com/v1/genai/black-forest-labs/flux.1-dev",
+    )
+    NVIDIA_CHAT_URL = os.getenv(
+        "NVIDIA_CHAT_URL", "https://integrate.api.nvidia.com/v1/chat/completions"
+    )
+    NVIDIA_CHAT_MODEL = os.getenv(
+        "NVIDIA_CHAT_MODEL", "meta/llama-3.2-90b-vision-instruct"
+    )
+    NVIDIA_PROMPT_ENHANCEMENT = os.getenv(
+        "NVIDIA_PROMPT_ENHANCEMENT", "true"
+    ).lower() in ("1", "true", "yes", "on")
     CUSTOM_IMAGE_API_URL = os.getenv("CUSTOM_IMAGE_API_URL", "")
     CUSTOM_IMAGE_API_KEY = os.getenv("CUSTOM_IMAGE_API_KEY", "")
     DEFAULT_AI_PROVIDER = os.getenv("DEFAULT_AI_PROVIDER", "pollinations")
