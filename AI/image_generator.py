@@ -56,6 +56,69 @@ def _gen_gemini(prompt: str, timeout: int = 60) -> bytes:
         raise ImageGenerationError(f"Gemini failed: {e}")
 
 
+
+def _gen_nvidia(prompt: str, timeout: int = 180) -> bytes:
+    """Generate a PNG with NVIDIA's FLUX.1-dev NIM endpoint."""
+    if not Config.NVIDIA_API_KEY:
+        raise ImageGenerationError("NVIDIA_API_KEY not configured")
+
+    headers = {
+        "Authorization": f"Bearer {Config.NVIDIA_API_KEY}",
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+    }
+    payload = {"prompt": prompt, "width": 1024, "height": 1024, "steps": 30}
+
+    try:
+        response = requests.post(
+            Config.NVIDIA_FLUX_URL,
+            headers=headers,
+            json=payload,
+            timeout=timeout,
+        )
+    except requests.RequestException as exc:
+        raise ImageGenerationError(f"NVIDIA FLUX request failed: {exc}") from exc
+
+    if response.status_code != 200:
+        raise ImageGenerationError(
+            f"NVIDIA FLUX HTTP {response.status_code}: {response.text[:500]}"
+        )
+
+    content_type = response.headers.get("content-type", "").lower()
+    if content_type.startswith("image/"):
+        return response.content
+
+    # NVIDIA NIM normally returns a base64 image in JSON. Support common
+    # response shapes so a minor response-format variation is recoverable.
+    try:
+        data = response.json()
+    except ValueError as exc:
+        raise ImageGenerationError("NVIDIA FLUX returned neither image bytes nor JSON") from exc
+
+    encoded = data.get("image")
+    if not encoded and data.get("artifacts"):
+        encoded = data["artifacts"][0].get("base64")
+    if not encoded and data.get("images"):
+        encoded = data["images"][0].get("image") or data["images"][0].get("b64_json")
+    if not encoded and data.get("data"):
+        first = data["data"][0]
+        encoded = first.get("b64_json") or first.get("image")
+        image_url = first.get("url")
+        if not encoded and image_url:
+            downloaded = requests.get(image_url, timeout=timeout)
+            downloaded.raise_for_status()
+            return downloaded.content
+
+    if not encoded:
+        raise ImageGenerationError(f"Unexpected NVIDIA FLUX response: {str(data)[:500]}")
+
+    import base64
+    try:
+        return base64.b64decode(encoded)
+    except Exception as exc:
+        raise ImageGenerationError("Could not decode NVIDIA FLUX image") from exc
+
+
 def _gen_custom(prompt: str, timeout: int = 60) -> bytes:
     if not Config.CUSTOM_IMAGE_API_URL:
         raise ImageGenerationError("CUSTOM_IMAGE_API_URL not set")
@@ -83,6 +146,7 @@ _PROVIDER_MAP = {
     "huggingface": _gen_huggingface,
     "gemini": _gen_gemini,
     "custom": _gen_custom,
+    "nvidia": _gen_nvidia,
 }
 
 
@@ -91,7 +155,9 @@ _PROVIDER_MAP = {
 def generate_image(prompt: str, provider: str = "pollinations",
                    retries: int = 3, fallback: bool = True) -> bytes:
     """Returns PNG bytes. Tries provider, then retries, then fallback."""
-    order = [provider] if not fallback else [provider, "pollinations", "huggingface"]
+    order = [provider] if not fallback else list(dict.fromkeys(
+        [provider, "nvidia", "pollinations", "huggingface"]
+    ))
     last_err = None
     for prov in order:
         if prov not in _PROVIDER_MAP:
