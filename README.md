@@ -25,3 +25,7 @@ MongoDB, and GitHub Actions.
    git branch -M main
    git remote add origin https://github.com/YOURNAME/ai-coloring-book-factory.git
    git push -u origin main
+
+## NVIDIA API setup
+
+The project supports NVIDIA NIM for FLUX.1-dev image generation and optional Llama prompt enhancement. Set `NVIDIA_API_KEY` in your local `.env` or as a GitHub Actions repository secret. In GitHub, add it under **Settings → Secrets and variables → Actions**. The Telegram AI Provider menu includes **NVIDIA FLUX**. `NVIDIA_PROMPT_ENHANCEMENT=true` enables one Llama request to refine each book's page prompts; set it to `false` to use the local prompt templates only. Never commit your real `.env` file or API keys.
