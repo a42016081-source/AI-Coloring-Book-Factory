@@ -36,6 +36,7 @@ def book_creation_menu():
 
 def ai_provider_menu():
     return ReplyKeyboardMarkup([
+        [KeyboardButton("NVIDIA FLUX")],
         [KeyboardButton("Hugging Face")],
         [KeyboardButton("Pollinations")],
         [KeyboardButton("Gemini")],
