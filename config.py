@@ -30,7 +30,7 @@ class Config:
 
     # AI
     HF_TOKEN = os.getenv("HF_TOKEN", "")
-    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+    NVIDIA_API_KEY = os.getenv("NVIDIA_API_KEY", "")
     CUSTOM_IMAGE_API_URL = os.getenv("CUSTOM_IMAGE_API_URL", "")
     CUSTOM_IMAGE_API_KEY = os.getenv("CUSTOM_IMAGE_API_KEY", "")
     DEFAULT_AI_PROVIDER = os.getenv("DEFAULT_AI_PROVIDER", "pollinations")
